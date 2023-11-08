@@ -64,7 +64,7 @@ def CDKM(eng, a, b, c, n):
 
     for i in range(2,n-1):
         CNOT | (a[i-1], b[i])
-    CNOT | (a[n - 1], b[n - 1])
+    #CNOT | (a[n - 1], b[n - 1])
 
     Toffoli_gate(eng, a[n - 4], b[n - 3], a[n - 3])
 
@@ -81,15 +81,16 @@ def CDKM(eng, a, b, c, n):
     X | b[1]
     CNOT | (a[1], c)
 
-    for i in range(n-1):
+    for i in range(n):
         CNOT | (a[i], b[i])
 
 def takahashi(eng,a,b,n): # modular adder
 
-    for i in range(1,n-1):
+    for i in range(1,n):
         CNOT | (a[i], b[i])
 
-    CNOT | (a[n-1], b[n-1])
+    CNOT | (a[n-2], b[n-1])
+
 
     for i in range(n-3,0,-1):
         CNOT | (a[i], a[i+1])
@@ -97,11 +98,11 @@ def takahashi(eng,a,b,n): # modular adder
     for i in range(n-2):
         Toffoli_gate(eng, a[i], b[i], a[i+1])
 
-    Toffoli_gate(eng, a[n-2], b[n-2], a[n-1])
+    Toffoli_gate(eng, a[n-2], b[n-2], b[n-1])
 
     for i in range(n-2,0,-1):
         CNOT | (a[i], b[i])
-        Toffoli_gate(eng, b[i-1], a[i-1], a[i])
+        Toffoli_gate(eng, a[i-1], b[i-1], a[i])
 
     for i in range(1,n-2):
         CNOT | (a[i], a[i+1])
@@ -125,8 +126,8 @@ def test(eng):
         print('b: ', end='')
         print_vector(eng, b, n)
 
-    # CDKM(eng, a, b, ancilla, n)
-    takahashi(eng, a, b, n)
+    CDKM(eng, a, b, ancilla, n)
+    #takahashi(eng, a, b, n)
 
     if (resource_check != 1):
         print('sum: ', end='')
