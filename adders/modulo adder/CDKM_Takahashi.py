@@ -84,12 +84,36 @@ def CDKM(eng, a, b, c, n):
     for i in range(n-1):
         CNOT | (a[i], b[i])
 
+def takahashi(eng,a,b,n): # modular adder
+
+    for i in range(1,n-1):
+        CNOT | (a[i], b[i])
+
+    CNOT | (a[n-1], b[n-1])
+
+    for i in range(n-3,0,-1):
+        CNOT | (a[i], a[i+1])
+
+    for i in range(n-2):
+        Toffoli_gate(eng, a[i], b[i], a[i+1])
+
+    Toffoli_gate(eng, a[n-2], b[n-2], a[n-1])
+
+    for i in range(n-2,0,-1):
+        CNOT | (a[i], b[i])
+        Toffoli_gate(eng, b[i-1], a[i-1], a[i])
+
+    for i in range(1,n-2):
+        CNOT | (a[i], a[i+1])
+
+    for i in range(n-1):
+        CNOT | (a[i], b[i])
+
 def test(eng):
     n = 5 # bit length
     a = eng.allocate_qureg(n)
     b = eng.allocate_qureg(n)
     ancilla = eng.allocate_qubit()
-    CDKM(eng, a, b, ancilla, n)
 
     if (resource_check != 1):
         Round_constant_XOR(0b10101, a, n)
@@ -99,6 +123,13 @@ def test(eng):
         print('a: ', end='')
         print_vector(eng, a, n)
         print('b: ', end='')
+        print_vector(eng, b, n)
+
+    # CDKM(eng, a, b, ancilla, n)
+    takahashi(eng, a, b, n)
+
+    if (resource_check != 1):
+        print('sum: ', end='')
         print_vector(eng, b, n)
 
 global resource_check
